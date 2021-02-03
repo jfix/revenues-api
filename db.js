@@ -5,12 +5,12 @@ const mongoose = require('mongoose')
 
 // =============================================================================
 // DB CONNECTION DETAILS
-const dbUser = process.env.EXPORT_STATS_MONGO_USER
-const dbPwd = process.env.EXPORT_STATS_MONGO_PWD
-const dbHost = process.env.EXPORT_STATS_MONGO_HOST
-const dbDb = process.env.EXPORT_STATS_MONGO_DB
-// const dbConn = `mongodb://${dbUser}:${dbPwd}@${dbHost}/${dbDb}`
-const dbConn = `mongodb://${dbHost}/${dbDb}`
+const dbUser = process.env.REVENUES_MONGO_USER
+const dbPwd = process.env.REVENUES_MONGO_PWD
+const dbHost = process.env.REVENUES_MONGO_HOST
+const dbDb = process.env.REVENUES_MONGO_DB
+const dbConn = `mongodb://${dbUser}:${dbPwd}@${dbHost}/${dbDb}`
+// const dbConn = `mongodb://${dbHost}/${dbDb}`
 
 // =============================================================================
 // SCHEMA FOR A REVENUE RECORD
@@ -64,7 +64,7 @@ const StatsPipeline = [
     $sort: { _id: 1 }
   },
   {
-    // create an array containing the _id and revenue values as items
+    // create an array containing the _id and revenue values as an object
     '$group': {
       '_id': null,
       'data': {
@@ -83,7 +83,7 @@ const StatsPipeline = [
       }
     }
   },
-  // convert the array to an object
+  // remove _id key
   {
     $project: {
       "_id": 0
@@ -138,6 +138,7 @@ const LastQuarter = [
   }
 ]
 
+// get the first and the currently last dates that are in the database
 const FirstAndLastDates = [
   {
     '$sort': {
