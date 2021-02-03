@@ -2,14 +2,17 @@ const express = require('express')
 const { getRevenues, getIndex } = require('./api-get.js')
 const app = express()
 
-// =============================================================================
-// IGNORE ALL GET REQUESTS EXCEPT UPTIMEBOT
+app.disable('x-powered-by')
+
+// ==============================================
+// SERVE REQUESTS FOR /
 app.get('/', getIndex)
 
-// =============================================================================
-// RETURN STATS, HEATMAP AND MEME DATA AS ONE JSON OBJECT
+// ==============================================
+// RETURN ILIBRARY ECOMMERCE REVENUES INFORMATION
 app.get('/revenues', getRevenues)
 
-app.listen(process.env.PORT || 3000, () => {
-  console.log('REPL.IT HTTP Express server started');
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => {
+  console.log(`Revenues API server started on port ${PORT}`)
 });
