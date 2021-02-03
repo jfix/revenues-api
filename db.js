@@ -65,26 +65,29 @@ const StatsPipeline = [
   },
   {
     // create an array containing the _id and revenue values as items
-    $group: {
-      _id: null,
-      data: {
-        $push: {
-          "k": "$_id",
-          "v": { $toDouble: "$revenue" }
+    '$group': {
+      '_id': null,
+      'data': {
+        '$push': {
+          '$arrayToObject': [
+            [
+              {
+                'k': '$_id',
+                'v': {
+                  '$toDouble': '$revenue'
+                }
+              }
+            ]
+          ]
         }
       }
     }
   },
+  // convert the array to an object
   {
-    // convert the array to an object
     $project: {
-      "res": { "$arrayToObject": "$data" },
       "_id": 0
     }
-  },
-  {
-    // remove the fake root item
-    $replaceRoot: { newRoot: "$res" }
   }
 ]
 const LastQuarter = [
@@ -98,10 +101,10 @@ const LastQuarter = [
     '$group': {
       '_id': {
         '$dateToString': {
-          'date': '$date', 
+          'date': '$date',
           'format': '%Y-%m-%d'
         }
-      }, 
+      },
       'revenue': {
         '$sum': '$revenue'
       }
@@ -112,13 +115,13 @@ const LastQuarter = [
     }
   }, {
     '$group': {
-      '_id': null, 
+      '_id': null,
       'data': {
         '$push': {
           '$arrayToObject': [
             [
               {
-                'k': '$_id', 
+                'k': '$_id',
                 'v': {
                   '$toDouble': '$revenue'
                 }
@@ -142,20 +145,20 @@ const FirstAndLastDates = [
     }
   }, {
     '$group': {
-      '_id': null, 
+      '_id': null,
       'first-date': {
         '$first': '$$ROOT'
-      }, 
+      },
       'last-date': {
         '$last': '$$ROOT'
       }
     }
   }, {
     '$group': {
-      '_id': null, 
+      '_id': null,
       'dates': {
         '$push': {
-          'firstDate': '$first-date.date', 
+          'firstDate': '$first-date.date',
           'lastDate': '$last-date.date'
         }
       }
@@ -166,7 +169,7 @@ const FirstAndLastDates = [
         '$arrayElemAt': [
           '$dates', 0
         ]
-      }, 
+      },
       '_id': 0
     }
   }, {
@@ -187,10 +190,10 @@ const LastTwoDays = [
     '$group': {
       '_id': {
         '$dateToString': {
-          'date': '$date', 
+          'date': '$date',
           'format': '%Y-%m-%d'
         }
-      }, 
+      },
       'revenue': {
         '$sum': '$revenue'
       }
@@ -201,13 +204,13 @@ const LastTwoDays = [
     }
   }, {
     '$group': {
-      '_id': null, 
+      '_id': null,
       'data': {
         '$push': {
           '$arrayToObject': [
             [
               {
-                'k': '$_id', 
+                'k': '$_id',
                 'v': {
                   '$toDouble': '$revenue'
                 }
@@ -225,9 +228,9 @@ const LastTwoDays = [
 ]
 
 const Revenue = mongoose.model('Revenue', revenueSchema)
-mongoose.connect(dbConn, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true 
+mongoose.connect(dbConn, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 })
 
 module.exports = {

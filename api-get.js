@@ -49,10 +49,9 @@ const getStats = () => {
             const twoDays = await Revenue.aggregate(LastTwoDays)
             const lastQuarter = await Revenue.aggregate(LastQuarter)
             const firstAndLastDates = await Revenue.aggregate(FirstAndLastDates)
-            console.log(`FLD: ${JSON.stringify(firstAndLastDates)}`)
             return resolve({
                 firstAndLastDates: firstAndLastDates[0],
-                monthlyTotals: stats[0],
+                monthlyTotals: stats[0].data,
                 overallTotal: total[0].overallTotal,
                 twoDays: twoDays[0].data,
                 lastQuarter: lastQuarter[0].data
