@@ -38,6 +38,33 @@ const TotalPipeline = [{
   }
 }]
 
+const MinMaxAvgPipeline = [
+  {
+    '$group': {
+      '_id': null, 
+      'min': {
+        '$min': {
+          '$toDouble': '$revenue'
+        }
+      }, 
+      'max': {
+        '$max': {
+          '$toDouble': '$revenue'
+        }
+      }, 
+      'avg': {
+        '$avg': {
+          '$toDouble': '$revenue'
+        }
+      }
+    }
+  }, {
+    '$project': {
+      '_id': false
+    }
+  }
+]
+
 // this function is used by the /stats endpoint to retrieve data
 const StatsPipeline = [
   {
@@ -240,5 +267,6 @@ module.exports = {
   LastTwoDays,
   LastQuarter,
   FirstAndLastDates,
+  MinMaxAvgPipeline,
   Revenue
 }

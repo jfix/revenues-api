@@ -5,6 +5,7 @@ const {
     LastTwoDays, 
     LastQuarter, 
     FirstAndLastDates,
+    MinMaxAvgPipeline,
     Revenue 
 } = require('./db.js')
 
@@ -21,12 +22,14 @@ const getRevenues = async (request, response) => {
         const twoDays = await Revenue.aggregate(LastTwoDays)
         const lastQuarter = await Revenue.aggregate(LastQuarter)
         const firstAndLastDates = await Revenue.aggregate(FirstAndLastDates)
+        const minMaxAvg = await Revenue.aggregate(MinMaxAvgPipeline)
 
         if (stats && total && twoDays && lastQuarter && firstAndLastDates) {
             console.log(`*** ${new Date()}: Serving revenue stats.`)
             response.setHeader('Access-Control-Allow-Origin', '*')
             await response.json({
                 firstAndLastDates: firstAndLastDates[0],
+                minMaxAvg: minMaxAvg[0],
                 monthlyTotals: stats[0].data,
                 overallTotal: total[0].overallTotal,
                 twoDays: twoDays[0].data,
