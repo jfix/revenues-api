@@ -40,27 +40,42 @@ const TotalPipeline = [{
 
 const MinMaxAvgPipeline = [
   {
+    '$sort': {
+      'revenue': -1
+    }
+  }, {
     '$group': {
       '_id': null, 
       'min': {
-        '$min': {
-          '$toDouble': '$revenue'
-        }
+        '$last': '$$ROOT'
       }, 
       'max': {
-        '$max': {
-          '$toDouble': '$revenue'
-        }
+        '$first': '$$ROOT'
       }, 
       'avg': {
         '$avg': {
-          '$toDouble': '$revenue'
+          '$toDouble': '$$ROOT.revenue'
+        }
+      }
+    }
+  }, {
+    '$addFields': {
+      'min': {
+        'revenue': {
+          '$toDouble': '$$ROOT.min.revenue'
+        }
+      }, 
+      'max': {
+        'revenue': {
+          '$toDouble': '$$ROOT.max.revenue'
         }
       }
     }
   }, {
     '$project': {
-      '_id': false
+      '_id': false, 
+      'min._id': false, 
+      'max._id': false
     }
   }
 ]
