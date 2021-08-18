@@ -37,7 +37,7 @@ pipeline {
                         robocopy .\\node_modules %DEPLOYMENT_PATH%\\node_modules /mt /z /e /ns /np /nc /nfl /ndl /r:5 /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0
                     )
                 '''
-                bat 'robocopy . %DEPLOYMENT_PATH%\\public /mt /z /e /ns /np /nc /nfl /ndl /r:5 /xd .git ci-scripts /xf README.md .env .gitignore package-lock.json  /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0'
+                bat 'robocopy . %DEPLOYMENT_PATH% /mt /z /e /ns /np /nc /nfl /ndl /r:5 /xd .git ci-scripts /xf README.md .env .gitignore package-lock.json  /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0'
         
                 // IMPORTANT: force deletion of package.json so that pm2 restarts the app (robocopy skips files that have not changed)
                 bat '''
