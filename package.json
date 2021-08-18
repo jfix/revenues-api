@@ -17,7 +17,7 @@
     "got": "^11.6.0",
     "moment": "^2.27.0",
     "mongodb": "^3.6.2",
-    "mongoose": "^5.10.3",
+    "mongoose": "^5.13.7",
     "querystring": "^0.2.0",
     "saslprep": "^1.0.3"
   }
