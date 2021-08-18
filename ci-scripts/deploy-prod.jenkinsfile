@@ -34,7 +34,7 @@ pipeline {
                 // so  "^ & IF %ERRORLEVEL% LEQ 1 exit 0" is added after the command but it would exit the bat (without executing the rest of the bat)
                 bat '''
                     IF %dependenciesHaveChanged%==true (
-                        robocopy .\\node_modules %DEPLOYMENT_PATH%\\\node_modules /mt /z /e /ns /np /nc /nfl /ndl /r:5 /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0
+                        robocopy .\\node_modules %DEPLOYMENT_PATH%\\node_modules /mt /z /e /ns /np /nc /nfl /ndl /r:5 /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0
                     )
                 '''
                 bat 'robocopy . %DEPLOYMENT_PATH%\\public /mt /z /e /ns /np /nc /nfl /ndl /r:5 /xd .git ci-scripts /xf README.md .env .gitignore package-lock.json  /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0'
@@ -44,7 +44,8 @@ pipeline {
                     IF EXIST %DEPLOYMENT_PATH%\\package.json (
                         del /q /f %DEPLOYMENT_PATH%\\package.json
                     )
-                    robocopy .\\package.json %DEPLOYMENT_PATH%\\package.json /mt /z /ns /np /nc /nfl /ndl /r:5 ^ & IF %ERRORLEVEL% LEQ 1 exit 0
+                    REM fromDir toDir fileNameToCopy options ...
+                    robocopy . %DEPLOYMENT_PATH% package.json /mt /z /ns /np /nc /nfl /ndl /r:5 ^ & IF %ERRORLEVEL% LEQ 1 exit 0
                 '''
             }
         }
