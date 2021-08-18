@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    tools {nodejs "NodeJS 14.17.0"}
+
+    // make sure the same job does not run at the same time
+    options {
+        disableConcurrentBuilds()
+    }
+
+    // check every 30 minutes for changes in GitHub
+    triggers { 
+        pollSCM('H/2 * * * *') 
+    }
+
+    parameters {
+        string(name: 'DEPLOYMENT_PATH', defaultValue: '\\\\PAC-APP-1\\Applications\\revenues-api')
+        booleanParam(name: 'dependenciesHaveChanged', defaultValue: false, description: 'manually set this param to true when dependencies have changes (otherwise node_modules will not be deployed)<br />not ideal, but it takes several minutes to copy the node_modules folder and most of the commit will not contain dependencies changes')
+    }
+    stages {
+        stage('Git clone') {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'github-with-token-as-password', url: 'https://github.com/oecd/revenues-api']]])
+            }
+        }
+        stage('Install dependencies') {
+            steps {
+                bat 'npm install'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                // IMPORTANT: each robocopy MUST be in its own bat because it can return exit code 1 (which is ok but would make the step fail)
+                // so  "^ & IF %ERRORLEVEL% LEQ 1 exit 0" is added after the command but it would exit the bat (without executing the rest of the bat)
+                bat '''
+                    IF %dependenciesHaveChanged%==true (
+                        robocopy .\\node_modules %DEPLOYMENT_PATH%\\\node_modules /mt /z /e /ns /np /nc /nfl /ndl /r:5 /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0
+                    )
+                '''
+                bat 'robocopy . %DEPLOYMENT_PATH%\\public /mt /z /e /ns /np /nc /nfl /ndl /r:5 /xd .git ci-scripts /xf README.md .env .gitignore package-lock.json  /purge ^ & IF %ERRORLEVEL% LEQ 1 exit 0'
+        
+                // IMPORTANT: force deletion of package.json so that pm2 restarts the app (robocopy skips files that have not changed)
+                bat '''
+                    IF EXIST %DEPLOYMENT_PATH%\\package.json (
+                        del /q /f %DEPLOYMENT_PATH%\\package.json
+                    )
+                    robocopy .\\package.json %DEPLOYMENT_PATH%\\package.json /mt /z /ns /np /nc /nfl /ndl /r:5 ^ & IF %ERRORLEVEL% LEQ 1 exit 0
+                '''
+            }
+        }
+    }
+}
