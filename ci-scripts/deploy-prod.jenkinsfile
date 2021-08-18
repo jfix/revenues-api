@@ -20,7 +20,7 @@ pipeline {
     stages {
         stage('Git clone') {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'github-with-token-as-password', url: 'https://github.com/oecd/revenues-api']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], userRemoteConfigs: [[credentialsId: 'github-with-token-as-password', url: 'https://github.com/jfix/revenues-api']]])
             }
         }
         stage('Install dependencies') {
